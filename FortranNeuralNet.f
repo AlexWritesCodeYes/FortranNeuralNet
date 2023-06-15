@@ -111,9 +111,12 @@ module subroutines
     do i = 2, num_layers
         do j = 1, layer_size(i)
             do k = 1, layer_size(i-1)
-                weight_matrix(i,j,k) = weight_mat(i,j,k) - alpha * prev_weight_mat(i,j,k)
+                weight_matrix(i,j,k) = weight_mat(i,j,k) - alpha * &
+                prev_weight_mat(i,j,k)
             end do
-            weight_matrix(i,j,(layer_size(i-1))) = weight_mat(i,j,(layer_size(i-1)))-alpha*prev_weight_mat(i,j,(layer_size(i-1)))
+            weight_matrix(i,j,(layer_size(i-1))) = &
+            weight_mat(i,j,(layer_size(i-1)))-alpha*&
+            prev_weight_mat(i,j,(layer_size(i-1)))
         end do
     end do
     END FUNCTION applyMomentum
@@ -135,13 +138,15 @@ module subroutines
             weight_old = 0.0
             do k = 1, layer_size(i-1)
                 !print *,"derr ",delta_err_mat(i,j)," out ",output_mat((i-1),k)
-                prev_weight_mat(i,j,k) = beta * delta_err_mat(i,j) * output_mat((i-1),k)
+                prev_weight_mat(i,j,k) = beta * delta_err_mat(i,j) * &
+                output_mat((i-1),k)
                 weight_mat(i,j,k) = weight_mat(i,j,k) + prev_weight_mat(i,j,k)
             end do
             weight_old = beta * delta_err_mat(i,j)
             prev_weight_mat(i,j,(layer_size(i-1))) = weight_old
 
-            weight_mat(i,j,(layer_size(i-1))) = weight_mat(i,j,(layer_size(i-1))) + weight_old
+            weight_mat(i,j,(layer_size(i-1))) = &
+            weight_mat(i,j,(layer_size(i-1))) + weight_old
 
 
             !print *,"i: ",i,"j: ",j,"old weight: ",weight_old," new weight: ",weight_new
@@ -201,14 +206,15 @@ REAL, DIMENSION(8, 4) :: data = reshape((/ 0, 0, 0, 0, &
                                                     shape(data), order=(/2,1/))
 
 REAL, DIMENSION(8, 3) :: training_data = reshape((/ 0, 0, 0, &
-                                                             0, 0, 1, &
-                                                             0, 1, 0, &
-                                                             0, 1, 1, &
-                                                             1, 0, 0, &
-                                                             1, 0, 1, &
-                                                             1, 1, 0, &
-                                                             1, 1, 1/), &
-                                                             shape(training_data), order=(/2,1/))
+                                                        0, 0, 1, &
+                                                        0, 1, 0, &
+                                                        0, 1, 1, &
+                                                        1, 0, 0, &
+                                                        1, 0, 1, &
+                                                        1, 1, 0, &
+                                                        1, 1, 1/), &
+                                                        shape(training_data),&
+                                                        order=(/2,1/))
 
 layer_size = (/3, 3, 3, 3, 1/)
 outputs = (/8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0/)
@@ -305,6 +311,7 @@ print *," "
 
 !out_matrix = output_mat
 !DONT DO THIS IT FUCKS UP EVERYTHING
+!TODO: figure out why this ruins everything
 !do i=1,8
 !    CALL feedForward(out_matrix,training_data(i,:),num_layers,layer_size,weight_mat)
 !    outputs(i) = out_matrix(num_layers,1)
@@ -312,7 +319,8 @@ print *," "
 
 print *,"results: "
 do i=1,8
-    print *, training_data(i,1)," ",training_data(i,2)," ",training_data(i,3)," ",outputs(i)
+    print *, training_data(i,1)," ",training_data(i,2)," ",training_data(i,3),&
+    " ",outputs(i)
 end do
 
 deallocate(output_mat, out_matrix,delta_err_mat)
