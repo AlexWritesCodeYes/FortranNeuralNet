@@ -221,7 +221,7 @@ outputs = (/8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 8.0/)
 num_layers = 5
 num_iterations = 999999    !this number modulo 8 should return 7
                                      !this is to ensure all the data is processed
-beta = 0.1
+beta = 0.01
 alpha = 0.0
 threshold = 0.0001
 mse = 1.0
@@ -308,14 +308,11 @@ print *,data(8,1)," ",data(8,2)," ",data(8,3)," ",data(8,4)
 print *," "
 
 !test the trained network
-
-!out_matrix = output_mat
-!DONT DO THIS IT FUCKS UP EVERYTHING
-!TODO: figure out why this ruins everything
-!do i=1,8
-!    CALL feedForward(out_matrix,training_data(i,:),num_layers,layer_size,weight_mat)
-!    outputs(i) = out_matrix(num_layers,1)
-!end do
+out_matrix = output_mat
+do i=1,8
+    CALL feedForward(out_matrix,training_data(i,:),num_layers,layer_size,weight_mat)
+    outputs(i) = out_matrix(num_layers,1)
+end do
 
 print *,"results: "
 do i=1,8
