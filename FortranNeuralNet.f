@@ -11,7 +11,7 @@ module subroutines
     end if
     END FUNCTION sigmoid
 
-    REAL FUNCTION meanSquaredError(target_arr, output_arr) RESULT(result)
+    REAL FUNCTION rootMeanSquaredError(target_arr, output_arr) RESULT(result)
     REAL, INTENT(IN), DIMENSION(:) :: target_arr, output_arr
 
     REAL square, difference
@@ -24,7 +24,7 @@ module subroutines
     end do
     result = (square / i)**0.5
     !RETURN
-    END FUNCTION meanSquaredError
+    END FUNCTION rootMeanSquaredError
 
     SUBROUTINE feedForward(output_mat, input_arr, num_layers,&
         layer_size, weight_mat)
@@ -189,10 +189,10 @@ use subroutines
 !REMINDER: declarations MUST come before assignments
 
 INTEGER layer_size(5), num_layers, num_iterations
-REAL b, a, threshold, mse, outputs(8), old_mse
+REAL b, a, threshold, rmse, outputs(8), old_rmse
 REAL, DIMENSION(:,:), allocatable :: output_mat, out_matrix, delta_err_mat
 REAL, DIMENSION(:,:,:), allocatable :: weight_mat, prev_weight_mat
-INTEGER i, j, k, mse_count
+INTEGER i, j, k, rmse_count
 REAL rand_val, out_val
 
 REAL, DIMENSION(8, 4) :: data = reshape((/ 0, 0, 0, 0, &
@@ -224,7 +224,7 @@ num_iterations = 999999    !this number modulo 8 should return 7
 beta = 0.01
 alpha = 0.0
 threshold = 0.0001
-mse = 1.0
+rmse = 1.0
 
 !TODO: figure out how to allocate this more neatly
 allocate(output_mat(num_layers,layer_size(1)))
@@ -263,7 +263,7 @@ end do
 weight_mat = RESHAPE(weight_mat,SHAPE(weight_mat),order=(/3,2,1/))
 prev_weight_mat=RESHAPE(prev_weight_mat,SHAPE(prev_weight_mat),order=(/3,2,1/))
 
-mse_count = 0
+rmse_count = 0
 do i = 1,8
     do j = 0,num_iterations
         out_val = 0.0
@@ -273,25 +273,25 @@ do i = 1,8
         out_val = output_mat(num_layers,1)
         outputs(i) = out_val
         
-        !TODO: disable this if the mse is below 0.01
-        mse = meanSquaredError(data(:,4), outputs)
-        if(old_mse == mse) then
-            mse_count = mse_count + 1
-            if(mse_count >= 100) then
+        !TODO: disable this if the rmse is below 0.01
+        rmse = rootMeanSquaredError(data(:,4), outputs)
+        if(old_rmse == rmse) then
+            rmse_count = rmse_count + 1
+            if(rmse_count >= 100) then
                 CALL random_number(weight_mat)
-                mse_count = 0
+                rmse_count = 0
             end if
         end if
-        old_mse = mse
-        if(mse < threshold) then
+        old_rmse = rmse
+        if(rmse < threshold) then
             print *,"DONE at iteration ",j," of i: ",i
             exit
         end if
-        !if(mse > mse+1) exit
-        !if(ISNAN(mse)) exit
-        !print *,"mse: ",mse
+        !if(rmse > rmse+1) exit
+        !if(ISNAN(rmse)) exit
+        !print *,"rmse: ",rmse
     end do
-    if(mse < threshold) then
+    if(rmse < threshold) then
         print *,"DONE at iteration ",j," of i: ",i
         exit
     end if
